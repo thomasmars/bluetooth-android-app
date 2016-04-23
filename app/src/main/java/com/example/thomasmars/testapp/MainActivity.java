@@ -109,23 +109,19 @@ public class MainActivity extends AppCompatActivity {
 
         createBluetooth();
 
-        Button forward = (Button) findViewById(R.id.button);
-        forward.setOnClickListener(new View.OnClickListener() {
+        // Create buttons
+        createBtButton(R.id.F, "forward");
+        createBtButton(R.id.F_L, "forward_left");
+        createBtButton(R.id.F_R, "forward_right");
+        createBtButton(R.id.B, "backward");
+        createBtButton(R.id.B_L, "backward_left");
+        createBtButton(R.id.B_R, "backward_right");
+
+        Button exit = (Button) findViewById(R.id.EXIT);
+        exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("Main Activity", "Derp logging!");
-                Snackbar.make(view, "derpderp", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
-
-                sendBtMessage("asdf");
-            }
-        });
-
-        Button asdf = (Button) findViewById(R.id.button2);
-        asdf.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+                sendBtMessage("exit");
                 try {
                     bs.close();
                 }
@@ -134,12 +130,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
-        Button drive = (Button) findViewById(R.id.button3);
-        drive.setOnClickListener(new View.OnClickListener() {
+    private void createBtButton(int viewId, final String btMessage) {
+        Button b = (Button) findViewById(viewId);
+        b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendBtMessage("drive");
+                sendBtMessage(btMessage);
             }
         });
     }
