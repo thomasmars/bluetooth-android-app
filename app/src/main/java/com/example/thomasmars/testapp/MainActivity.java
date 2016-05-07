@@ -1,40 +1,35 @@
 package com.example.thomasmars.testapp;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
+import android.app.Application;
 import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.Set;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
-
     private BluetoothSocket bs;
 
     private void sendBtMessage(String msg2send) {
 
+        Log.i("Main Activity", "Trying to send sendBtMessage: " + bs.toString());
         // Create socket
         try {
-
             if (!bs.isConnected()) {
                 Log.i("Main Activity", "CONNECTED!");
                 bs.connect();
+            }
+            else {
+                Toast.makeText(getApplicationContext(), "You are not connected!", Toast.LENGTH_SHORT);
+                return;
             }
             Log.i("Main Activity", "Message to send: " + msg2send);
 
@@ -51,63 +46,17 @@ public class MainActivity extends AppCompatActivity {
             os.write(msg2send.getBytes());
 
         } catch (IOException e) {
+            Toast.makeText(getApplicationContext(), "Messaging error!", Toast.LENGTH_SHORT);
             Log.i("Main Activity", "Went to shit.." + e);
         }
-    }
-
-    private void createBluetooth() {
-        // Get bluetooth adapter ?
-        BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
-/*
-        // What is our name ?
-        String name = ba.getName();
-        Log.i("Main Activity", "Our name is: " + name);
-
-        int state = ba.getState();
-        Log.i("Main Activity", "state ? " + state);
-
-        // Is enabled ?
-        boolean isEnabled = ba.isEnabled();
-        Log.i("Main Activity", "We are enabled ? " + isEnabled);
-
-        //Check bonded devices
-        Set<BluetoothDevice> devices = ba.getBondedDevices();
-        for (BluetoothDevice device : devices) {
-            Log.i("Main Activity", "Device addr: " + device);
-        }*/
-
-        // Find bluetooth addresses
-
-
-        // Set our address
-        String macAddr = "00:1A:7D:DA:71:11";
-        Log.i("Main Activity", "Connecting to addr: " + macAddr);
-
-
-        // Validate address
-        BluetoothDevice remote = ba.getRemoteDevice(macAddr);
-        Log.i("Main Activity", "did we find remote ?" + remote);
-
-
-        UUID uuid = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
-        Log.i("Main Activity", "Using uuid: " + uuid);
-        try {
-            bs = remote.createInsecureRfcommSocketToServiceRecord(uuid);
-        }
-        catch (Exception e) {
-            Log.i("Main Activity", "Failed opening socket: " + e);
-        }
-
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        createBluetooth();
+        bs = ((MainApplication) getApplicationContext()).getBluetoothSocket();
 
         // Create buttons
         createBtButton(R.id.F, "forward");
@@ -116,20 +65,6 @@ public class MainActivity extends AppCompatActivity {
         createBtButton(R.id.B, "backward");
         createBtButton(R.id.B_L, "backward_left");
         createBtButton(R.id.B_R, "backward_right");
-
-        Button exit = (Button) findViewById(R.id.EXIT);
-        exit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendBtMessage("exit");
-                try {
-                    bs.close();
-                }
-                catch (Exception e) {
-                    Log.i("Main Actvitiy", "Could not close!");
-                }
-            }
-        });
     }
 
     private void createBtButton(int viewId, final String btMessage) {

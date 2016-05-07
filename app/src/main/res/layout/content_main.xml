@@ -21,11 +21,6 @@
                 android:text="Forward"
                 android:id="@+id/F" android:layout_gravity="center_horizontal|top"/>
         <Button
-                android:layout_width="305dp"
-                android:layout_height="108dp"
-                android:text="Exit!"
-                android:id="@+id/EXIT" android:layout_gravity="center_horizontal|bottom"/>
-        <Button
                 android:layout_width="110dp"
                 android:layout_height="172dp"
                 android:text="Forward Left"
