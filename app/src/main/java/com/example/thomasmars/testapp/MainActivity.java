@@ -1,8 +1,6 @@
 package com.example.thomasmars.testapp;
 
-import android.app.Application;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,39 +14,34 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity {
-    private BluetoothSocket bs;
+    private OutputStream os;
+    private boolean connected = true;
 
     private void sendBtMessage(String msg2send) {
-
-        Log.i("Main Activity", "Trying to send sendBtMessage: " + bs.toString());
-        // Create socket
-        try {
-            if (!bs.isConnected()) {
-                Log.i("Main Activity", "CONNECTED!");
-                bs.connect();
-            }
-            else {
-                Toast.makeText(getApplicationContext(), "You are not connected!", Toast.LENGTH_SHORT);
-                return;
-            }
-            Log.i("Main Activity", "Message to send: " + msg2send);
-
-            /*int maxPkt = bs.getMaxReceivePacketSize();
-            Log.i("Main Activity", "max receive packet size ?" + maxPkt);
-            int maxTPkt = bs.getMaxTransmitPacketSize();
-            Log.i("Main Activity", "max transmit packet size ? " + maxTPkt);*/
-
-/*            InputStream is = bs.getInputStream();
-            Log.i("Main Activity", "input stream " + is);*/
-            OutputStream os = bs.getOutputStream();
-            Log.i("Main Activity", "output stream " + os);
-
-            os.write(msg2send.getBytes());
-
-        } catch (IOException e) {
-            Toast.makeText(getApplicationContext(), "Messaging error!", Toast.LENGTH_SHORT);
-            Log.i("Main Activity", "Went to shit.." + e);
+        if (!isConnected()) {
+            return;
         }
+
+        try {
+            os.write(msg2send.getBytes());
+        }
+        catch (IOException e) {
+            Toast.makeText(getApplicationContext(),
+                    "Sending message failed: \"" + msg2send + "\"",
+                    Toast.LENGTH_SHORT)
+                    .show();
+            Log.i("Navigation Activity", "sendBtMessage failed: " + msg2send);
+        }
+
+    }
+
+    private boolean isConnected() {
+        if (!connected) {
+            Toast.makeText(getApplicationContext(), "You are not connected!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -56,7 +49,27 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bs = ((MainApplication) getApplicationContext()).getBluetoothSocket();
+        BluetoothSocket bs = ((MainApplication) getApplicationContext()).getBluetoothSocket();
+
+        try {
+            if (!bs.isConnected()) {
+                connected = false;
+                Toast.makeText(getApplicationContext(), "You are not connected!", Toast.LENGTH_SHORT).show();
+            }
+        }
+        catch (NullPointerException e) {
+            connected = false;
+            Toast.makeText(getApplicationContext(), "You are not connected!", Toast.LENGTH_SHORT).show();
+        }
+
+
+        try {
+            os = bs.getOutputStream();
+        }
+        catch (IOException e) {
+            Log.i("Main Activity", "Could not get output stream: " + e);
+            Toast.makeText(getApplicationContext(), "Could not get output stream", Toast.LENGTH_SHORT).show();
+        }
 
         // Create buttons
         createBtButton(R.id.F, "forward");
@@ -68,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createBtButton(int viewId, final String btMessage) {
+        Log.i("Main activity", "createBtButton!!!");
         Button b = (Button) findViewById(viewId);
         b.setOnClickListener(new View.OnClickListener() {
             @Override

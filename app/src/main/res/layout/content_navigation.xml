@@ -16,8 +16,22 @@
     <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/notConnected"
             android:id="@+id/switch1"
-            android:layout_marginTop="75dp" android:checked="false"
-            android:layout_centerHorizontal="true"/>
+            android:text="@string/connected"
+            android:layout_marginTop="75dp"
+            android:checked="false"
+            android:layout_centerHorizontal="true"
+    />
+    <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar" android:layout_centerVertical="true" android:layout_centerHorizontal="true"
+            android:indeterminate="true"/>
+    <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Camera"
+            android:id="@+id/cameraSwitch" android:layout_below="@+id/progressBar" android:layout_alignStart="@+id/switch1"
+            android:layout_marginTop="72dp" android:checked="false"/>
 </RelativeLayout>
